@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 
 using namespace std;
@@ -34,6 +35,8 @@ void ConvertToBinary(const string &input_filename, int threshold, const string &
     	std::cerr << "File cannot be opened for reading." << std::endl;
     	exit(1); // exit if failed to open the file
   	}
+
+    
 }
 
 int main(int argc, char **argv){  

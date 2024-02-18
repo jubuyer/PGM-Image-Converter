@@ -1,4 +1,4 @@
-<YOUR NAME>
+Jubayer Ahmed
 Computational Vision Homework 2
 
 1. All four parts of the assignment have been completed.
@@ -7,7 +7,7 @@ Computational Vision Homework 2
 4. Input files same as the ones provided.
 
 Program_1 Binary_Conversion:
-    - The threshold value used for testing is 121
+    - The threshold value used for testing is 128
 
 Program_2 Image_Labeling:
     - Comments
