@@ -29,14 +29,24 @@ void ConvertToBinary(const string &input_filename, int threshold, const string &
   cout << "Threshold: " << threshold << endl;
   cout << "Output filename: " << output_filename << endl;
 
-   // account for non-existent file - covering edge case of file error
-    std::ifstream fin(input_filename);
-  	if (fin.fail()) {
-    	std::cerr << "File cannot be opened for reading." << std::endl;
-    	exit(1); // exit if failed to open the file
-  	}
+  Image input;
 
-    
+  ReadImage(input_filename, &input);
+  
+  size_t input_rows = input.num_rows();
+  size_t input_cols = input.num_columns();
+
+  for (int i = 0; i < input_rows; ++i) {
+    for (int j = 0; j < input_cols; ++j) {
+      if(input.GetPixel(i, j) > threshold) {
+        input.SetPixel(i, j, 255);
+      } else {
+        input.SetPixel(i, j, 0);
+      }
+    }
+  }
+
+  WriteImage(output_filename, input);
 }
 
 int main(int argc, char **argv){  
