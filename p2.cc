@@ -15,6 +15,34 @@
 using namespace std;
 using namespace ComputerVisionProjects;
 
+void PixelLabeler(Image input, size_t row, size_t col, int& current_pixel_label) {
+  if(row-1 < 0) {
+    if(col-1 > 0) {
+      //Labeling pixels in first row
+      if(input.GetPixel(row, col) != 0) {
+        if(input.GetPixel(row, col-1) == 0) {
+          input.SetPixel(row,col, current_pixel_label);
+          current_pixel_label--; 
+        } else if (input.GetPixel(row, col-1) != 0) {
+          input.SetPixel(row,col, input.GetPixel(row, col-1)); 
+        }
+      }
+    } else {
+      if(input.GetPixel(row, col) != 0) {
+      //Labeling pixels in first col
+        if(input.GetPixel(row-1, col) == 0) {
+          input.SetPixel(row,col, current_pixel_label);
+          current_pixel_label--; 
+        } else if (input.GetPixel(row, col-1) != 0) {
+          input.SetPixel(row,col, input.GetPixel(row-1, col)); 
+        }
+      }
+
+    } 
+  }
+
+}
+
 // @brief Implementation of sequential labeling algorithm
 // @param input_filename the name of the input image
 // @param output_filename the name of the output image
@@ -33,11 +61,7 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
-      if(i-1 <= 0 && j-1 <= 0) {
-        if(GetPixel(i,j) == 0) {
-          
-        } 
-      }
+
     }
   }
 
