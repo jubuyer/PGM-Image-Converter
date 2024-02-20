@@ -33,7 +33,11 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
-      
+      if(i-1 <= 0 && j-1 <= 0) {
+        if(GetPixel(i,j) == 0) {
+          
+        } 
+      }
     }
   }
 
