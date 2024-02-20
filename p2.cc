@@ -1,5 +1,5 @@
 //
-// <YOUR NAME>
+// Jubayer Ahmed
 // Computational Vision Homework 2
 // Program 2
 //
@@ -22,7 +22,21 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
   cout << "Sequential labeling" << endl;
   cout << "Input filename: " << input_filename << endl;
   cout << "Output filename: " << output_filename << endl;
-    // .. Code that calls other functions
+
+  Image input;
+
+  ReadImage(input_filename, &input);
+  
+  size_t input_rows = input.num_rows();
+  size_t input_cols = input.num_columns();
+  int current_label = 255;
+
+  for (int i = 0; i < input_rows; ++i) {
+    for (int j = 0; j < input_cols; ++j) {
+      
+    }
+  }
+
 }
 
 int main(int argc, char **argv){
