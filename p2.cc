@@ -114,7 +114,7 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
       if(current_pixel > 0) { // pixel not background
         //surrounded by background
-        if((diagonal_pixel == 0) && (left_pixel == 0) && (top_pixel == 0) && (current_pixel != 0)) {
+        if((diagonal_pixel == 0) && (left_pixel == 0) && (top_pixel == 0)) {
           input.SetPixel(i, j, current_label);
           current_label-=5;
           cout << current_label << "\n";
