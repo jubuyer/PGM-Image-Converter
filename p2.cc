@@ -84,36 +84,60 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
   size_t input_cols = input.num_columns();
 
   int current_label = 255;
+  int current_pixel = 0;
+  int diagonal_pixel = 0;
+  int left_pixel = 0;
+  int top_pixel = 0;
   // cout << "Current Label: " << current_label << "\n";
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
-      if(input.GetPixel(i, j) > 0) { // pixel not background
+      current_pixel = input.GetPixel(i, j);
+
+      if((i-1) > 0) {
+        top_pixel = input.GetPixel(i-1, j);
+      } else {
+        top_pixel = 0;
+      }
+
+      if((j-1) > 0) {
+        left_pixel = input.GetPixel(i, j-1);
+      } else {
+        left_pixel = 0;
+      }
+
+      if(((i-1) > 0) && ((j-1) > 0)) {
+        diagonal_pixel = input.GetPixel(i-1, j-1);
+      } else {
+        diagonal_pixel = 0;
+      }
+
+      if(current_pixel > 0) { // pixel not background
         //surrounded by background
-        if((input.GetPixel(i-1, j-1) == 0) && (input.GetPixel(i, j-1) == 0) && (input.GetPixel(i-1, j) == 0)) {
+        if((diagonal_pixel == 0) && (left_pixel == 0) && (top_pixel == 0) && (current_pixel != 0)) {
           input.SetPixel(i, j, current_label);
-          current_label-=10;
+          current_label-=5;
           cout << current_label << "\n";
         }
 
         //left diagonal isn't background
-        if(input.GetPixel(i-1, j-1) > 0) {
-          input.SetPixel(i, j, input.GetPixel(i-1, j-1));
-        } else if (input.GetPixel(i-1, j-1) == 0) {
+        if(diagonal_pixel > 0) {
+          input.SetPixel(i, j, diagonal_pixel);
+        } else if (diagonal_pixel == 0) {
           //left isn't background
-          if((input.GetPixel(i, j-1) > 0) && (input.GetPixel(i-1, j) == 0)) {
-            input.SetPixel(i, j, input.GetPixel(i, j-1));
+          if((left_pixel > 0) && (top_pixel == 0)) {
+            input.SetPixel(i, j, left_pixel);
           }
 
           //top isn't background
-          if((input.GetPixel(i, j-1) == 0) && (input.GetPixel(i-1, j) > 0)) {
-            input.SetPixel(i, j, input.GetPixel(i-1, j));
+          if((left_pixel == 0) && (top_pixel > 0)) {
+            input.SetPixel(i, j, top_pixel);
           }
 
           //top and left aren't background
-          if((input.GetPixel(i, j-1) > 0) && (input.GetPixel(i-1, j) > 0)) {
-            input.SetPixel(i, j, input.GetPixel(i-1, j));
-            input.SetPixel(i, j-1, input.GetPixel(i-1, j));
+          if((left_pixel > 0) && (top_pixel > 0)) {
+            input.SetPixel(i, j, top_pixel);
+            input.SetPixel(i, j-1, top_pixel);
           } 
         }
       } else {
