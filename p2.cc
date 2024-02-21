@@ -88,10 +88,37 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
-        if(input.GetPixel(i, j) > 0) {
-          if(input.GetPixel(i-1, j-1) > 0)
-            input.SetPixel(i, j, 200);
+      if(input.GetPixel(i, j) > 0) { // pixel not background
+        //surrounded by background
+        if((input.GetPixel(i-1, j-1) == 0) && (input.GetPixel(i, j-1) == 0) && (input.GetPixel(i-1, j) == 0)) {
+          input.SetPixel(i, j, current_label);
+          current_label-=10;
+          cout << current_label << "\n";
         }
+
+        //left diagonal isn't background
+        if(input.GetPixel(i-1, j-1) > 0) {
+          input.SetPixel(i, j, input.GetPixel(i-1, j-1));
+        } else if (input.GetPixel(i-1, j-1) == 0) {
+          //left isn't background
+          if((input.GetPixel(i, j-1) > 0) && (input.GetPixel(i-1, j) == 0)) {
+            input.SetPixel(i, j, input.GetPixel(i, j-1));
+          }
+
+          //top isn't background
+          if((input.GetPixel(i, j-1) == 0) && (input.GetPixel(i-1, j) > 0)) {
+            input.SetPixel(i, j, input.GetPixel(i-1, j));
+          }
+
+          //top and left aren't background
+          if((input.GetPixel(i, j-1) > 0) && (input.GetPixel(i-1, j) > 0)) {
+            input.SetPixel(i, j, input.GetPixel(i-1, j));
+            input.SetPixel(i, j-1, input.GetPixel(i-1, j));
+          } 
+        }
+      } else {
+        input.SetPixel(i, j, 0);
+      }
     }
   }
 
