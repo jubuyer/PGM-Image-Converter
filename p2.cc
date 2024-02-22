@@ -87,7 +87,7 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
   DisjSets EqClasses(pixels);
 
-  int current_label = 1;
+  int current_label = 50;
   int current_pixel = 0;
   int diagonal_pixel = 0;
   int left_pixel = 0;
@@ -148,15 +148,19 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
               left_root = EqClasses.find(left_pixel);
               top_root = EqClasses.find(top_pixel);
 
-              if((left_root != left_pixel) && (top_root != top_pixel)) {
-                EqClasses.unionSets(EqClasses.find(top_root), EqClasses.find(left_root));
-              } else if((left_root == left_pixel) && (top_root != top_pixel)) {
-                EqClasses.unionSets(EqClasses.find(top_root), left_root);
-              } else if ((left_root != left_pixel) && (top_root == top_pixel)) {
-                EqClasses.unionSets(top_root, EqClasses.find(left_root));
-              } else {
+              if(top_root != left_root) {
                 EqClasses.unionSets(top_root, left_root);
               }
+
+              // if((left_root != left_pixel) && (top_root != top_pixel)) {
+              //   EqClasses.unionSets(EqClasses.find(top_root), EqClasses.find(left_root));
+              // } else if((left_root == left_pixel) && (top_root != top_pixel)) {
+              //   EqClasses.unionSets(EqClasses.find(top_root), left_root);
+              // } else if ((left_root != left_pixel) && (top_root == top_pixel)) {
+              //   EqClasses.unionSets(top_root, EqClasses.find(left_root));
+              // } else {
+              //   EqClasses.unionSets(top_root, left_root);
+              // }
             }
           }
         }
@@ -173,7 +177,7 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
       min_pixel = EqClasses.find(current_pixel);
       input.SetPixel(i,j, min_pixel);
-      cout << "set to: " << min_pixel << "\n";
+      // cout << "set to: " << min_pixel << "\n";
     }
   }
 
