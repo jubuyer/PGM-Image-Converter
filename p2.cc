@@ -93,6 +93,8 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
   int left_pixel = 0;
   int top_pixel = 0;
   int min_pixel = 0;
+  int left_root = 0;
+  int top_root = 0;
   // cout << "Current Label: " << current_label << "\n";
 
   // First Pass - Assigning Labels
@@ -128,18 +130,34 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
         } else if(diagonal_pixel > 0) {
           //left diagonal isn't background
           input.SetPixel(i, j, diagonal_pixel);
+          cout << "diag\n";
         } else if(diagonal_pixel == 0) {
           if((left_pixel > 0) && (top_pixel == 0)) {
             //left isn't background
+            cout << "left\n";
             input.SetPixel(i, j, left_pixel);
           } else if(((left_pixel == 0) && (top_pixel > 0))) {
             //top isn't background
+            cout << "top\n";
             input.SetPixel(i, j, top_pixel);
           } else if((left_pixel > 0) && (top_pixel > 0)) {
             //top and left aren't background
-            min_pixel = (top_pixel, left_pixel); // calc min gray level
-            input.SetPixel(i, j, min_pixel);
-            EqClasses.unionSets(top_pixel, left_pixel);
+            // min_pixel = (top_pixel, left_pixel); // calc min gray level
+            input.SetPixel(i, j, top_pixel);
+            if(left_pixel != top_pixel) {
+              left_root = EqClasses.find(left_pixel);
+              top_root = EqClasses.find(top_pixel);
+
+              if((left_root != left_pixel) && (top_root != top_pixel)) {
+                EqClasses.unionSets(EqClasses.find(top_root), EqClasses.find(left_root));
+              } else if((left_root == left_pixel) && (top_root != top_pixel)) {
+                EqClasses.unionSets(EqClasses.find(top_root), left_root);
+              } else if ((left_root != left_pixel) && (top_root == top_pixel)) {
+                EqClasses.unionSets(top_root, EqClasses.find(left_root));
+              } else {
+                EqClasses.unionSets(top_root, left_root);
+              }
+            }
           }
         }
       } else {
