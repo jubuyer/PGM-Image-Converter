@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 using namespace ComputerVisionProjects;
@@ -83,55 +84,58 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
 
-  int current_label = 255;
+  int current_label = 1;
   int current_pixel = 0;
   int diagonal_pixel = 0;
   int left_pixel = 0;
   int top_pixel = 0;
+  int min_pixel = 0;
   // cout << "Current Label: " << current_label << "\n";
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
       current_pixel = input.GetPixel(i, j);
 
-      if((i-1) > 0) {
-        top_pixel = input.GetPixel(i-1, j); // not in first row
-      } else {
-        top_pixel = 0; //in first row
-      }
-
-      if((j-1) > 0) {
-        left_pixel = input.GetPixel(i, j-1); //not in first column
-      } else {
-        left_pixel = 0; // in first column
-      }
-
-      if(((i-1) > 0) && ((j-1) > 0)) {
-        diagonal_pixel = input.GetPixel(i-1, j-1); // not first pixel
-      } else {
-        diagonal_pixel = 0; // first pixel
-      }
-
       if(current_pixel > 0) { // pixel not background
+        // calc surrounding pixel values
+        if((i-1) > 0) {
+          top_pixel = input.GetPixel(i-1, j); // not in first row
+        } else {
+          top_pixel = 0; //in first row
+        }
+
+        if((j-1) > 0) {
+          left_pixel = input.GetPixel(i, j-1); //not in first column
+        } else {
+          left_pixel = 0; // in first column
+        }
+
+        if(((i-1) > 0) && ((j-1) > 0)) {
+          diagonal_pixel = input.GetPixel(i-1, j-1); // not first pixel
+        } else {
+          diagonal_pixel = 0; // first pixel
+        }      
+
         //surrounded by background
         if((diagonal_pixel == 0) && (left_pixel == 0) && (top_pixel == 0)) {
           input.SetPixel(i, j, current_label);
-          current_label-=1;
+          current_label++;
           cout << current_label << "\n";
         } else if(diagonal_pixel > 0) {
           //left diagonal isn't background
           input.SetPixel(i, j, diagonal_pixel);
-        } else if (diagonal_pixel == 0) {
-          //top and left aren't background
-          if((left_pixel > 0) && (top_pixel > 0)) {
-            input.SetPixel(i, j, top_pixel);
-            input.SetPixel(i, j-1, top_pixel);
-          } else if(left_pixel > 0) {
+        } else if(diagonal_pixel == 0) {
+          if((left_pixel > 0) && (top_pixel == 0)) {
             //left isn't background
             input.SetPixel(i, j, left_pixel);
-          } else if(top_pixel > 0) {
+          } else if(((left_pixel == 0) && (top_pixel > 0))) {
             //top isn't background
             input.SetPixel(i, j, top_pixel);
+          } else if((left_pixel > 0) && (top_pixel > 0)) {
+            //top and left aren't background
+            min_pixel = (top_pixel, left_pixel); // calc min gray level
+            input.SetPixel(i, j, min_pixel);
+            input.SetPixel(i, j-1, min_pixel);
           }
         }
       } else {
