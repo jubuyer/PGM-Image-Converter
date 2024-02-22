@@ -83,6 +83,9 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
+  int pixels = input_rows*input_cols;
+
+  DisjSets EqClasses(pixels);
 
   int current_label = 1;
   int current_pixel = 0;
@@ -92,6 +95,7 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
   int min_pixel = 0;
   // cout << "Current Label: " << current_label << "\n";
 
+  // First Pass - Assigning Labels
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
       current_pixel = input.GetPixel(i, j);
@@ -135,12 +139,23 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
             //top and left aren't background
             min_pixel = (top_pixel, left_pixel); // calc min gray level
             input.SetPixel(i, j, min_pixel);
-            input.SetPixel(i, j-1, min_pixel);
+            EqClasses.unionSets(top_pixel, left_pixel);
           }
         }
       } else {
         input.SetPixel(i, j, 0);
       }
+    }
+  }
+
+  // Second Pass - Resolving equivalent pixels
+  for (int i = 0; i < input_rows; ++i) {
+    for (int j = 0; j < input_cols; ++j) {
+      current_pixel = input.GetPixel(i, j);
+
+      min_pixel = EqClasses.find(current_pixel);
+      input.SetPixel(i,j, min_pixel);
+      cout << "set to: " << min_pixel << "\n";
     }
   }
 
