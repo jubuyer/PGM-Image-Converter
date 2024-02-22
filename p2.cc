@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <set>
 
 using namespace std;
 using namespace ComputerVisionProjects;
@@ -87,7 +88,7 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
   DisjSets EqClasses(pixels);
 
-  int current_label = 50;
+  int current_label = 1;
   int current_pixel = 0;
   int diagonal_pixel = 0;
   int left_pixel = 0;
@@ -126,19 +127,19 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
         if((diagonal_pixel == 0) && (left_pixel == 0) && (top_pixel == 0)) {
           input.SetPixel(i, j, current_label);
           current_label++;
-          cout << current_label << "\n";
+          // cout << current_label << "\n";
         } else if(diagonal_pixel > 0) {
           //left diagonal isn't background
           input.SetPixel(i, j, diagonal_pixel);
-          cout << "diag\n";
+          // cout << "diag\n";
         } else if(diagonal_pixel == 0) {
           if((left_pixel > 0) && (top_pixel == 0)) {
             //left isn't background
-            cout << "left\n";
+            // cout << "left\n";
             input.SetPixel(i, j, left_pixel);
           } else if(((left_pixel == 0) && (top_pixel > 0))) {
             //top isn't background
-            cout << "top\n";
+            // cout << "top\n";
             input.SetPixel(i, j, top_pixel);
           } else if((left_pixel > 0) && (top_pixel > 0)) {
             //top and left aren't background
@@ -170,6 +171,8 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
     }
   }
 
+
+  set<int> roots;
   // Second Pass - Resolving equivalent pixels
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
@@ -177,9 +180,25 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
 
       min_pixel = EqClasses.find(current_pixel);
       input.SetPixel(i,j, min_pixel);
+
+      roots.insert(min_pixel);
       // cout << "set to: " << min_pixel << "\n";
     }
   }
+
+  // for(auto x: roots) cout << x << endl;
+
+  set<int> colors;
+  for (int i = 0; i < input_rows; ++i) {
+    for (int j = 0; j < input_cols; ++j) {
+      current_pixel = input.GetPixel(i, j);
+
+      colors.insert(current_pixel);
+      // cout << "set to: " << min_pixel << "\n";
+    }
+  }
+
+  for(auto x: colors) cout << x << endl;
 
   WriteImage(output_filename, input);
 }
