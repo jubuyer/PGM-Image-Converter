@@ -95,50 +95,44 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
       current_pixel = input.GetPixel(i, j);
 
       if((i-1) > 0) {
-        top_pixel = input.GetPixel(i-1, j);
+        top_pixel = input.GetPixel(i-1, j); // not in first row
       } else {
-        top_pixel = 0;
+        top_pixel = 0; //in first row
       }
 
       if((j-1) > 0) {
-        left_pixel = input.GetPixel(i, j-1);
+        left_pixel = input.GetPixel(i, j-1); //not in first column
       } else {
-        left_pixel = 0;
+        left_pixel = 0; // in first column
       }
 
       if(((i-1) > 0) && ((j-1) > 0)) {
-        diagonal_pixel = input.GetPixel(i-1, j-1);
+        diagonal_pixel = input.GetPixel(i-1, j-1); // not first pixel
       } else {
-        diagonal_pixel = 0;
+        diagonal_pixel = 0; // first pixel
       }
 
       if(current_pixel > 0) { // pixel not background
         //surrounded by background
         if((diagonal_pixel == 0) && (left_pixel == 0) && (top_pixel == 0)) {
           input.SetPixel(i, j, current_label);
-          current_label-=5;
+          current_label-=1;
           cout << current_label << "\n";
-        }
-
-        //left diagonal isn't background
-        if(diagonal_pixel > 0) {
+        } else if(diagonal_pixel > 0) {
+          //left diagonal isn't background
           input.SetPixel(i, j, diagonal_pixel);
         } else if (diagonal_pixel == 0) {
-          //left isn't background
-          if((left_pixel > 0) && (top_pixel == 0)) {
-            input.SetPixel(i, j, left_pixel);
-          }
-
-          //top isn't background
-          if((left_pixel == 0) && (top_pixel > 0)) {
-            input.SetPixel(i, j, top_pixel);
-          }
-
           //top and left aren't background
           if((left_pixel > 0) && (top_pixel > 0)) {
             input.SetPixel(i, j, top_pixel);
             input.SetPixel(i, j-1, top_pixel);
-          } 
+          } else if(left_pixel > 0) {
+            //left isn't background
+            input.SetPixel(i, j, left_pixel);
+          } else if(top_pixel > 0) {
+            //top isn't background
+            input.SetPixel(i, j, top_pixel);
+          }
         }
       } else {
         input.SetPixel(i, j, 0);
