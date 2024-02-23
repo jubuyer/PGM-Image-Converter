@@ -23,7 +23,16 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   cout << "Input labeled image filename: " << input_filename << endl;
   cout << "Output descriptions filename: " << output_descriptions_filename << endl;
   cout << "Output image filename: " << output_image_filename << endl;
-  // .. Code that calls other functions
+
+  Image input;
+
+  ReadImage(input_filename, &input);
+  // cout << "Read Image\n";
+
+  size_t input_rows = input.num_rows();
+  size_t input_cols = input.num_columns();
+
+  
 }
 
 int main(int argc, char **argv){
