@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 using namespace ComputerVisionProjects;
@@ -32,7 +33,7 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
 
-  
+  std::vector<std::vector<int>> ObjArea;
 }
 
 int main(int argc, char **argv){
