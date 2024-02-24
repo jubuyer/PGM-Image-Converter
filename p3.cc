@@ -11,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <set>
 
 using namespace std;
 using namespace ComputerVisionProjects;
@@ -33,7 +34,26 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
 
-  std::vector<std::vector<int>> ObjArea;
+  struct ObjectDesc {
+    int object_label;
+    int area = 0;
+    int row_centr;
+    int col_centr;
+    int e_min;
+    int roundedness;
+    int orientation;
+  };
+
+  std::vector<ObjectDesc> Objects;
+  set<int> labels;
+  int current_pixel = 0;
+
+  for (int i = 0; i < input_rows; ++i) {
+  for (int j = 0; j < input_cols; ++j) {
+
+  }
+}
+
 }
 
 int main(int argc, char **argv){
