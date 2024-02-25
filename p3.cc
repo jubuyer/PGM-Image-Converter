@@ -16,6 +16,58 @@
 using namespace std;
 using namespace ComputerVisionProjects;
 
+struct ObjectDesc {
+  int object_label = 0;
+  int area = 0;
+  int rows = 0;
+  int cols = 0;
+  int row_centr = 0;
+  int col_centr = 0;
+  int e_min = 0;
+  int roundedness = 0;
+  int orientation = 0;
+};
+
+//returns index of object with current_pixel's label from the objects vector
+int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
+  int length = objects.size();
+  int index = -1;
+
+  for(int i = 0; i < length; i++) {
+    if(objects[i].object_label == current_pixel)
+      index = i;
+  }
+
+  return index;
+}
+
+// increases area of each object with label current_pixel and creates new objects as necessary
+void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel) {
+  // pixel is part of object
+  int obj_index;
+
+  if(current_pixel > 0) {
+    // if current pixel label has already been discovered
+    if(labels.find(current_pixel) != labels.end()) {
+      // find the object struct with the corresponding label in objects vector
+      obj_index = FindObject(objects, current_pixel);
+      // add 1 to the objects area
+      objects[obj_index].area += 1;
+    } else {
+      // add label to set containing discovered labels
+      labels.insert(current_pixel);
+
+      // create new object
+      ObjectDesc new_object;
+      new_object.object_label = current_pixel; // set new label
+      new_object.area += 1; // increase area
+
+      // push object into vector
+      objects.push_back(new_object);
+    }
+  }
+}
+
 // @brief Compute object properties
 // @param input_filename the name of the input labeled image
 // @param output_descriptions_filename the name of the output descriptions file (txt)
@@ -34,26 +86,23 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
 
-  struct ObjectDesc {
-    int object_label;
-    int area = 0;
-    int row_centr;
-    int col_centr;
-    int e_min;
-    int roundedness;
-    int orientation;
-  };
-
   std::vector<ObjectDesc> Objects;
   set<int> labels;
   int current_pixel = 0;
 
   for (int i = 0; i < input_rows; ++i) {
-  for (int j = 0; j < input_cols; ++j) {
-
+    for (int j = 0; j < input_cols; ++j) {
+      current_pixel = input.GetPixel(i, j);
+      
+      CalculateArea(Objects, labels, current_pixel);
+    }
   }
-}
 
+  int length = Objects.size();
+  for(int i = 0; i < length; i++) {
+    cout << i << " ";
+    cout << Objects[i].area << endl;
+  }
 }
 
 int main(int argc, char **argv){
