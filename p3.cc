@@ -159,7 +159,7 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   CalculateMoments(input, Objects, labels);
 
   for(int i = 0; i < length; i++) {
-    Objects[i].theta = atan2(Objects[i].b, (Objects[i].a-Objects[i].c));
+    Objects[i].theta = atan2(Objects[i].b, (Objects[i].a-Objects[i].c)) / 2;
 
     double theta = Objects[i].theta;
     Objects[i].e_min = (Objects[i].a*pow(sin(theta), 2)) - (Objects[i].b*sin(theta)*cos(theta)) + (Objects[i].c*pow(cos(theta), 2));
