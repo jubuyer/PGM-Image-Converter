@@ -13,6 +13,7 @@
 #include <vector>
 #include <set>
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
 using namespace ComputerVisionProjects;
@@ -24,11 +25,11 @@ struct ObjectDesc {
   double cols = 0;
   double row_centr = 0;
   double col_centr = 0;
-  double a = 0;
-  double b = 0;
-  double c = 0;
+  int a = 0;
+  int b = 0;
+  int c = 0;
   double theta = 0;
-  int e_min = 0;
+  double e_min = 0;
   int roundedness = 0;
   int orientation = 0;
 };
@@ -90,8 +91,31 @@ void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int 
   }
 }
 
-void CalculateMoments(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel, int row_coord, int col_coord) {
+void CalculateMoments(Image input, std::vector<ObjectDesc>& objects, std::set<int>& labels) {
+  size_t input_rows = input.num_rows();
+  size_t input_cols = input.num_columns();
+  int current_pixel = 0;
 
+  for (int i = 0; i < input_rows; ++i) {
+    for (int j = 0; j < input_cols; ++j) {
+      current_pixel = input.GetPixel(i, j);
+      
+      int obj_index;
+  
+      // pixel is part of object
+      if(current_pixel > 0) {
+      // if current pixel label has already been discovered
+        if(labels.find(current_pixel) != labels.end()) {
+          // find the object struct with the corresponding label in objects vector
+          obj_index = FindObject(objects, current_pixel);
+          // add col to the objects row
+          objects[obj_index].a += pow((j - objects[obj_index].col_centr),2);
+          objects[obj_index].b += 2*(j - objects[obj_index].col_centr)*(i - objects[obj_index].row_centr);
+          objects[obj_index].c += pow((i - objects[obj_index].row_centr),2);
+        }
+      }
+    }
+  }
 }
 
 // @brief Compute object properties
@@ -132,11 +156,23 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     Objects[i].col_centr = Objects[i].cols / Objects[i].area;
   }
 
+  CalculateMoments(input, Objects, labels);
+
   for(int i = 0; i < length; i++) {
+    Objects[i].theta = atan2(Objects[i].b, (Objects[i].a-Objects[i].c));
+
+    double theta = Objects[i].theta;
+    Objects[i].e_min = (Objects[i].a*pow(sin(theta), 2)) - (Objects[i].b*sin(theta)*cos(theta)) + (Objects[i].c*pow(cos(theta), 2));
+
     cout << i << " ";
     cout << Objects[i].area << " ";
     cout << Objects[i].row_centr << " ";
-    cout << Objects[i].col_centr << endl;
+    cout << Objects[i].col_centr << " ";
+
+    cout << setprecision(9) << Objects[i].a << " " << setprecision(9) << Objects[i].b << " ";
+    cout << setprecision(9) << Objects[i].c << " ";
+    cout << 180*Objects[i].theta / M_PI << " ";
+    cout << "emin: " << Objects[i].e_min << endl;
   }
 }
 
