@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <cmath>
 
 using namespace std;
 using namespace ComputerVisionProjects;
@@ -19,10 +20,14 @@ using namespace ComputerVisionProjects;
 struct ObjectDesc {
   int object_label = 0;
   int area = 0;
-  int rows = 0;
-  int cols = 0;
-  int row_centr = 0;
-  int col_centr = 0;
+  double rows = 0;
+  double cols = 0;
+  double row_centr = 0;
+  double col_centr = 0;
+  double a = 0;
+  double b = 0;
+  double c = 0;
+  double theta = 0;
   int e_min = 0;
   int roundedness = 0;
   int orientation = 0;
@@ -41,11 +46,28 @@ int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
   return index;
 }
 
+// increases num of rows and cols in an object
+void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel, int row_coord, int col_coord) {
+  int obj_index;
+  
+  // pixel is part of object
+  if(current_pixel > 0) {
+    // if current pixel label has already been discovered
+    if(labels.find(current_pixel) != labels.end()) {
+      // find the object struct with the corresponding label in objects vector
+      obj_index = FindObject(objects, current_pixel);
+      // add col to the objects row
+      objects[obj_index].cols += col_coord;
+      objects[obj_index].rows += row_coord;
+    }
+  }
+} 
+
 // increases area of each object with label current_pixel and creates new objects as necessary
 void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel) {
-  // pixel is part of object
   int obj_index;
 
+  // pixel is part of object
   if(current_pixel > 0) {
     // if current pixel label has already been discovered
     if(labels.find(current_pixel) != labels.end()) {
@@ -66,6 +88,10 @@ void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int 
       objects.push_back(new_object);
     }
   }
+}
+
+void CalculateMoments(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel, int row_coord, int col_coord) {
+
 }
 
 // @brief Compute object properties
@@ -95,13 +121,22 @@ void ComputeProperties(const string &input_filename, const string &output_descri
       current_pixel = input.GetPixel(i, j);
       
       CalculateArea(Objects, labels, current_pixel);
+
+      incrementObjVals(Objects, labels, current_pixel, i, j);
     }
   }
 
   int length = Objects.size();
   for(int i = 0; i < length; i++) {
+    Objects[i].row_centr = Objects[i].rows / Objects[i].area;
+    Objects[i].col_centr = Objects[i].cols / Objects[i].area;
+  }
+
+  for(int i = 0; i < length; i++) {
     cout << i << " ";
-    cout << Objects[i].area << endl;
+    cout << Objects[i].area << " ";
+    cout << Objects[i].row_centr << " ";
+    cout << Objects[i].col_centr << endl;
   }
 }
 
