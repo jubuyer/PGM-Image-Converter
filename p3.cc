@@ -141,6 +141,12 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   std::vector<ObjectDesc> Objects;
   set<int> labels;
   int current_pixel = 0;
+  double theta = 0.0;
+  double theta2 = 0.0;
+  double E_min = 0.0;
+  double E_max = 0.0;
+  int x_orient = 0.0;
+  int y_orient = 0.0;
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
@@ -164,16 +170,16 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     // calculate min theta and max theta
     Objects[i].theta = atan2(Objects[i].b, (Objects[i].a-Objects[i].c)) / 2.0;
     Objects[i].theta2 = Objects[i].theta + M_PI / 2.0;
-    double theta = Objects[i].theta;
-    double theta2 = Objects[i].theta2;
+    theta = Objects[i].theta;
+    theta2 = Objects[i].theta2;
 
     // calculate E_min and E_max
     Objects[i].e_min = (Objects[i].a*pow(sin(theta), 2)) - (Objects[i].b*sin(theta)*cos(theta)) + (Objects[i].c*pow(cos(theta), 2));
     Objects[i].e_max = (Objects[i].a*pow(sin(theta2), 2)) - (Objects[i].b*sin(theta2)*cos(theta2)) + (Objects[i].c*pow(cos(theta2), 2));
 
     // calculate roundedness
-    double E_min = Objects[i].e_min;
-    double E_max = Objects[i].e_max;
+    E_min = Objects[i].e_min;
+    E_max = Objects[i].e_max;
 
     Objects[i].roundedness = E_min / E_max;
 
@@ -181,10 +187,11 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     Objects[i].orientation = 180.0 * (theta / M_PI);
 
     // draw lines
-    int x_orient = Objects[i].col_centr + 10 * cos(theta); // x value of point on orientation line
-    int y_orient = Objects[i].row_centr + 10 * sin(theta); // x value of point on orientation line
+    x_orient = Objects[i].col_centr + 10 * cos(theta); // x value of point on orientation line
+    y_orient = Objects[i].row_centr + 10 * sin(theta); // x value of point on orientation line
 
     DrawLine(Objects[i].col_centr, Objects[i].row_centr, x_orient, y_orient, 150, &input);
+    // DrawLine(1, 50, 5, 60, 150, &input);
 
     // printing out information (debugging purposes)
     cout << i << " ";
@@ -199,7 +206,7 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     cout << "roundedness: " << Objects[i].roundedness << " ";
     cout << "orientation: " << Objects[i].orientation << endl;
   }
-
+  
   WriteImage(output_image_filename, input);
 }
 
