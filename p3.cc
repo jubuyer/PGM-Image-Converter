@@ -29,9 +29,11 @@ struct ObjectDesc {
   int b = 0;
   int c = 0;
   double theta = 0;
+  double theta2 = 0;
   double e_min = 0;
-  int roundedness = 0;
-  int orientation = 0;
+  double e_max = 0;
+  double roundedness = 0;
+  double orientation = 0;
 };
 
 //returns index of object with current_pixel's label from the objects vector
@@ -159,11 +161,32 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   CalculateMoments(input, Objects, labels);
 
   for(int i = 0; i < length; i++) {
-    Objects[i].theta = atan2(Objects[i].b, (Objects[i].a-Objects[i].c)) / 2;
-
+    // calculate min theta and max theta
+    Objects[i].theta = atan2(Objects[i].b, (Objects[i].a-Objects[i].c)) / 2.0;
+    Objects[i].theta2 = Objects[i].theta + M_PI / 2.0;
     double theta = Objects[i].theta;
-    Objects[i].e_min = (Objects[i].a*pow(sin(theta), 2)) - (Objects[i].b*sin(theta)*cos(theta)) + (Objects[i].c*pow(cos(theta), 2));
+    double theta2 = Objects[i].theta2;
 
+    // calculate E_min and E_max
+    Objects[i].e_min = (Objects[i].a*pow(sin(theta), 2)) - (Objects[i].b*sin(theta)*cos(theta)) + (Objects[i].c*pow(cos(theta), 2));
+    Objects[i].e_max = (Objects[i].a*pow(sin(theta2), 2)) - (Objects[i].b*sin(theta2)*cos(theta2)) + (Objects[i].c*pow(cos(theta2), 2));
+
+    // calculate roundedness
+    double E_min = Objects[i].e_min;
+    double E_max = Objects[i].e_max;
+
+    Objects[i].roundedness = E_min / E_max;
+
+    // calculate orientation
+    Objects[i].orientation = 180.0 * (theta / M_PI);
+
+    // draw lines
+    int x_orient = Objects[i].col_centr + 10 * cos(theta); // x value of point on orientation line
+    int y_orient = Objects[i].row_centr + 10 * sin(theta); // x value of point on orientation line
+
+    DrawLine(Objects[i].col_centr, Objects[i].row_centr, x_orient, y_orient, 150, &input);
+
+    // printing out information (debugging purposes)
     cout << i << " ";
     cout << Objects[i].area << " ";
     cout << Objects[i].row_centr << " ";
@@ -171,9 +194,13 @@ void ComputeProperties(const string &input_filename, const string &output_descri
 
     cout << setprecision(9) << Objects[i].a << " " << setprecision(9) << Objects[i].b << " ";
     cout << setprecision(9) << Objects[i].c << " ";
-    cout << 180*Objects[i].theta / M_PI << " ";
-    cout << "emin: " << Objects[i].e_min << endl;
+    cout << 180.0*Objects[i].theta / M_PI << " ";
+    cout << "emin: " << Objects[i].e_min << " ";
+    cout << "roundedness: " << Objects[i].roundedness << " ";
+    cout << "orientation: " << Objects[i].orientation << endl;
   }
+
+  WriteImage(output_image_filename, input);
 }
 
 int main(int argc, char **argv){
