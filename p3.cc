@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <set>
@@ -37,6 +38,9 @@ struct ObjectDesc {
 };
 
 //returns index of object with current_pixel's label from the objects vector
+// @brief 
+// @param 
+// @param s
 int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
   int length = objects.size();
   int index = -1;
@@ -50,6 +54,12 @@ int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
 }
 
 // increases num of rows and cols in an object
+// @brief 
+// @param 
+// @param 
+// @param 
+// @param 
+// @param 
 void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel, int row_coord, int col_coord) {
   int obj_index;
   
@@ -67,6 +77,10 @@ void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, i
 } 
 
 // increases area of each object with label current_pixel and creates new objects as necessary
+// @brief 
+// @param 
+// @param 
+// @param 
 void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel) {
   int obj_index;
 
@@ -93,6 +107,10 @@ void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int 
   }
 }
 
+// @brief 
+// @param 
+// @param 
+// @param 
 void CalculateMoments(Image input, std::vector<ObjectDesc>& objects, std::set<int>& labels) {
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
@@ -141,12 +159,15 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   std::vector<ObjectDesc> Objects;
   set<int> labels;
   int current_pixel = 0;
+
   double theta = 0.0;
   double theta2 = 0.0;
   double E_min = 0.0;
   double E_max = 0.0;
   int x_orient = 0.0;
   int y_orient = 0.0;
+
+  ofstream output(output_descriptions_filename);
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
@@ -191,7 +212,6 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     y_orient = Objects[i].col_centr + 30 * sin(theta); // x value of point on orientation line
 
     DrawLine(Objects[i].row_centr, Objects[i].col_centr, x_orient, y_orient, 150, &input);
-    // DrawLine(1, 50, 5, 60, 150, &input);
 
     // printing out information (debugging purposes)
     cout << i << " ";
@@ -205,8 +225,19 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     cout << "emin: " << Objects[i].e_min << " ";
     cout << "roundedness: " << Objects[i].roundedness << " ";
     cout << "orientation: " << Objects[i].orientation << endl;
+ 
+    // writing to output file
+    output << i << " ";
+    output << Objects[i].row_centr << " ";
+    output << Objects[i].col_centr << " ";
+    output << Objects[i].e_min << " ";
+    output << Objects[i].area << " ";
+    output << Objects[i].roundedness << " ";
+    output << Objects[i].orientation << "\n";
   }
   
+  output.close();
+
   WriteImage(output_image_filename, input);
 }
 
