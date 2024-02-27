@@ -59,9 +59,9 @@ void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, i
     if(labels.find(current_pixel) != labels.end()) {
       // find the object struct with the corresponding label in objects vector
       obj_index = FindObject(objects, current_pixel);
-      // add col to the objects row
-      objects[obj_index].cols += col_coord;
+      // add row and col coords to the objects row
       objects[obj_index].rows += row_coord;
+      objects[obj_index].cols += col_coord;
     }
   }
 } 
@@ -110,10 +110,10 @@ void CalculateMoments(Image input, std::vector<ObjectDesc>& objects, std::set<in
         if(labels.find(current_pixel) != labels.end()) {
           // find the object struct with the corresponding label in objects vector
           obj_index = FindObject(objects, current_pixel);
-          // add col to the objects row
-          objects[obj_index].a += pow((j - objects[obj_index].col_centr),2);
-          objects[obj_index].b += 2*(j - objects[obj_index].col_centr)*(i - objects[obj_index].row_centr);
-          objects[obj_index].c += pow((i - objects[obj_index].row_centr),2);
+          // calculate a b and c. x corresponds to i, and y corresponds to j
+          objects[obj_index].a += pow((i - objects[obj_index].row_centr),2);
+          objects[obj_index].b += 2*(i - objects[obj_index].row_centr)*(j - objects[obj_index].col_centr);
+          objects[obj_index].c += pow((j - objects[obj_index].col_centr),2);
         }
       }
     }
@@ -187,10 +187,10 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     Objects[i].orientation = 180.0 * (theta / M_PI);
 
     // draw lines
-    x_orient = Objects[i].col_centr + 10 * cos(theta); // x value of point on orientation line
-    y_orient = Objects[i].row_centr + 10 * sin(theta); // x value of point on orientation line
+    x_orient = Objects[i].row_centr + 30 * cos(theta); // x value of point on orientation line
+    y_orient = Objects[i].col_centr + 30 * sin(theta); // x value of point on orientation line
 
-    DrawLine(Objects[i].col_centr, Objects[i].row_centr, x_orient, y_orient, 150, &input);
+    DrawLine(Objects[i].row_centr, Objects[i].col_centr, x_orient, y_orient, 150, &input);
     // DrawLine(1, 50, 5, 60, 150, &input);
 
     // printing out information (debugging purposes)
@@ -199,9 +199,9 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     cout << Objects[i].row_centr << " ";
     cout << Objects[i].col_centr << " ";
 
-    cout << setprecision(9) << Objects[i].a << " " << setprecision(9) << Objects[i].b << " ";
+    cout << "a: " << setprecision(9) << Objects[i].a << " b: " << setprecision(9) << Objects[i].b << " c: ";
     cout << setprecision(9) << Objects[i].c << " ";
-    cout << 180.0*Objects[i].theta / M_PI << " ";
+    cout << "theta: " << theta << " ";
     cout << "emin: " << Objects[i].e_min << " ";
     cout << "roundedness: " << Objects[i].roundedness << " ";
     cout << "orientation: " << Objects[i].orientation << endl;
