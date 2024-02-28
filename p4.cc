@@ -35,6 +35,7 @@ struct ObjectDesc {
   double e_max = 0;
   double roundedness = 0;
   double orientation = 0;
+  bool detected = false;
 };
 
 //returns index of object with current_pixel's label from the objects vector
@@ -206,34 +207,6 @@ void ComputeProperties(const string &input_filename, const string &output_descri
 
     // calculate orientation
     Objects[i].orientation = 180.0 * (theta / M_PI);
-
-    // draw lines
-    x_orient = Objects[i].row_centr + 30 * cos(theta); // x value of point on orientation line
-    y_orient = Objects[i].col_centr + 30 * sin(theta); // x value of point on orientation line
-
-    DrawLine(Objects[i].row_centr, Objects[i].col_centr, x_orient, y_orient, 150, &input);
-
-    // printing out information (debugging purposes)
-    // cout << i << " ";
-    // cout << Objects[i].area << " ";
-    // cout << Objects[i].row_centr << " ";
-    // cout << Objects[i].col_centr << " ";
-
-    // cout << "a: " << setprecision(9) << Objects[i].a << " b: " << setprecision(9) << Objects[i].b << " c: ";
-    // cout << setprecision(9) << Objects[i].c << " ";
-    // cout << "theta: " << theta << " ";
-    // cout << "emin: " << Objects[i].e_min << " ";
-    // cout << "roundedness: " << Objects[i].roundedness << " ";
-    // cout << "orientation: " << Objects[i].orientation << endl;
- 
-    // writing to output file
-    // output << i << " ";
-    // output << Objects[i].row_centr << " ";
-    // output << Objects[i].col_centr << " ";
-    // output << Objects[i].e_min << " ";
-    // output << Objects[i].area << " ";
-    // output << Objects[i].roundedness << " ";
-    // output << Objects[i].orientation << "\n";
   }
   
 }
@@ -247,6 +220,9 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
   cout << "Input labeled image filename: " << input_filename << endl;
   cout << "input descriptions filename: " << input_descriptions_filename << endl;
   cout << "Output image filename: " << output_filename << endl;
+  
+  std::vector<ObjectDesc> DatabaseObjects;
+  std::vector<ObjectDesc> Inputbjects;
   
   string object_label_str = "";
   string row_centr_str = "";
@@ -273,14 +249,17 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
   }
 
   while(fin >> object_label_str >> row_centr_str >> col_centr_str >> e_min_str >> area_str >> roundedness_str >> orientation_str) {
-    cout << object_label_str << " " << row_centr_str << " "  << col_centr_str << " "  << e_min_str << " " << area_str << " ";
-    cout << roundedness_str << " "  << orientation_str << endl;
-
-    std::vector<ObjectDesc> Objects;
+    // cout << object_label_str << " " << row_centr_str << " "  << col_centr_str << " "  << e_min_str << " " << area_str << " ";
+    // cout << roundedness_str << " "  << orientation_str << endl;
 
     ObjectDesc new_object;
-    new_object.object_label = stoi(object_label_str); // set new label
-    new_object.area += 1; // increase area
+    new_object.object_label = stoi(object_label_str);
+    new_object.row_centr = stod(row_centr_str);
+    new_object.col_centr = stod(col_centr_str);
+    new_object.e_min = stod(e_min_str);
+    new_object.area = stoi(area_str);
+    new_object.roundedness = stod(roundedness_str); 
+    new_object.roundedness = stod(orientation_str); 
   }
 
 }
