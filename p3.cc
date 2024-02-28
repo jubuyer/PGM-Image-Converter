@@ -1,5 +1,5 @@
 //
-// <YOUR NAME>
+// Jubayer Ahmed
 // Computational Vision Homework 2
 // Program 3
 //
@@ -214,17 +214,17 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     DrawLine(Objects[i].row_centr, Objects[i].col_centr, x_orient, y_orient, 150, &input);
 
     // printing out information (debugging purposes)
-    cout << i << " ";
-    cout << Objects[i].area << " ";
-    cout << Objects[i].row_centr << " ";
-    cout << Objects[i].col_centr << " ";
+    // cout << i << " ";
+    // cout << Objects[i].area << " ";
+    // cout << Objects[i].row_centr << " ";
+    // cout << Objects[i].col_centr << " ";
 
-    cout << "a: " << setprecision(9) << Objects[i].a << " b: " << setprecision(9) << Objects[i].b << " c: ";
-    cout << setprecision(9) << Objects[i].c << " ";
-    cout << "theta: " << theta << " ";
-    cout << "emin: " << Objects[i].e_min << " ";
-    cout << "roundedness: " << Objects[i].roundedness << " ";
-    cout << "orientation: " << Objects[i].orientation << endl;
+    // cout << "a: " << setprecision(9) << Objects[i].a << " b: " << setprecision(9) << Objects[i].b << " c: ";
+    // cout << setprecision(9) << Objects[i].c << " ";
+    // cout << "theta: " << theta << " ";
+    // cout << "emin: " << Objects[i].e_min << " ";
+    // cout << "roundedness: " << Objects[i].roundedness << " ";
+    // cout << "orientation: " << Objects[i].orientation << endl;
  
     // writing to output file
     output << i << " ";
