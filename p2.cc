@@ -152,16 +152,6 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
               if(top_root != left_root) {
                 EqClasses.unionSets(top_root, left_root);
               }
-
-              // if((left_root != left_pixel) && (top_root != top_pixel)) {
-              //   EqClasses.unionSets(EqClasses.find(top_root), EqClasses.find(left_root));
-              // } else if((left_root == left_pixel) && (top_root != top_pixel)) {
-              //   EqClasses.unionSets(EqClasses.find(top_root), left_root);
-              // } else if ((left_root != left_pixel) && (top_root == top_pixel)) {
-              //   EqClasses.unionSets(top_root, EqClasses.find(left_root));
-              // } else {
-              //   EqClasses.unionSets(top_root, left_root);
-              // }
             }
           }
         }
@@ -198,7 +188,8 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
     }
   }
 
-  for(auto x: colors) cout << x << endl;
+  // Debugging number of color labels in PGM
+  // for(auto x: colors) cout << x << endl;
 
   WriteImage(output_filename, input);
 }
