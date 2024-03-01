@@ -41,7 +41,7 @@ struct ObjectDesc {
 //returns index of object with current_pixel's label from the objects vector
 // @brief 
 // @param 
-// @param s
+// @param
 int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
   int length = objects.size();
   int index = -1;
@@ -77,8 +77,8 @@ void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, i
   }
 } 
 
-// increases area of each object with label current_pixel and creates new objects as necessary
-// @brief 
+w
+// @brief increases area of each object with label current_pixel and creates new objects as necessary
 // @param 
 // @param 
 // @param 
@@ -245,8 +245,6 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
   }
 
   while(fin >> object_label_str >> row_centr_str >> col_centr_str >> e_min_str >> area_str >> roundedness_str >> orientation_str) {
-    // cout << object_label_str << " " << row_centr_str << " "  << col_centr_str << " "  << e_min_str << " " << area_str << " ";
-    // cout << roundedness_str << " "  << orientation_str << endl;
 
     ObjectDesc new_object;
     new_object.object_label = stoi(object_label_str);
@@ -260,20 +258,9 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
     DatabaseObjects.push_back(new_object);
   }
 
-  int db_length = DatabaseObjects.size();
-  // for(int i = 0; i < db_length; i++) {
-  //   cout << i << " ";
-  //   cout << DatabaseObjects[i].area << " ";
-  //   cout << DatabaseObjects[i].row_centr << " ";
-  //   cout << DatabaseObjects[i].col_centr << " ";
-
-  //   cout << "emin: " << DatabaseObjects[i].e_min << " ";
-  //   cout << "roundedness: " << DatabaseObjects[i].roundedness << " ";
-  //   cout << "orientation: " << DatabaseObjects[i].orientation << endl;
-  // }
-
   ComputeProperties(input, InputObjects);
 
+  int db_length = DatabaseObjects.size();
   int input_length = InputObjects.size();
   for(int i = 0; i < db_length; i++) {
     for(int j = 0; j < input_length; j++) {

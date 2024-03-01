@@ -40,7 +40,7 @@ struct ObjectDesc {
 //returns index of object with current_pixel's label from the objects vector
 // @brief 
 // @param 
-// @param s
+// @param 
 int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
   int length = objects.size();
   int index = -1;
@@ -53,8 +53,7 @@ int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
   return index;
 }
 
-// increases num of rows and cols in an object
-// @brief 
+// @brief increases num of rows and cols in an object
 // @param 
 // @param 
 // @param 
@@ -76,8 +75,7 @@ void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, i
   }
 } 
 
-// increases area of each object with label current_pixel and creates new objects as necessary
-// @brief 
+// @brief increases area of each object with label current_pixel and creates new objects as necessary
 // @param 
 // @param 
 // @param 
@@ -151,7 +149,6 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   Image input;
 
   ReadImage(input_filename, &input);
-  // cout << "Read Image\n";
 
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
@@ -212,19 +209,6 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     y_orient = Objects[i].col_centr + 30 * sin(theta); // x value of point on orientation line
 
     DrawLine(Objects[i].row_centr, Objects[i].col_centr, x_orient, y_orient, 150, &input);
-
-    // printing out information (debugging purposes)
-    // cout << i << " ";
-    // cout << Objects[i].area << " ";
-    // cout << Objects[i].row_centr << " ";
-    // cout << Objects[i].col_centr << " ";
-
-    // cout << "a: " << setprecision(9) << Objects[i].a << " b: " << setprecision(9) << Objects[i].b << " c: ";
-    // cout << setprecision(9) << Objects[i].c << " ";
-    // cout << "theta: " << theta << " ";
-    // cout << "emin: " << Objects[i].e_min << " ";
-    // cout << "roundedness: " << Objects[i].roundedness << " ";
-    // cout << "orientation: " << Objects[i].orientation << endl;
  
     // writing to output file
     output << i << " ";
