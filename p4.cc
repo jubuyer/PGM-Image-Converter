@@ -143,21 +143,10 @@ void CalculateMoments(Image input, std::vector<ObjectDesc>& objects, std::set<in
 // @param input_filename the name of the input labeled image
 // @param output_descriptions_filename the name of the output descriptions file (txt)
 // @param output_image_filename the name of the output image
-void ComputeProperties(const string &input_filename, const string &output_descriptions_filename, const string &output_image_filename) {
-  cout << "Compute properties" << endl;
-  cout << "Input labeled image filename: " << input_filename << endl;
-  cout << "Output descriptions filename: " << output_descriptions_filename << endl;
-  cout << "Output image filename: " << output_image_filename << endl;
-
-  Image input;
-
-  ReadImage(input_filename, &input);
-  // cout << "Read Image\n";
-
+void ComputeProperties(Image input, std::vector<ObjectDesc>& Objects) {
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
 
-  std::vector<ObjectDesc> Objects;
   set<int> labels;
   int current_pixel = 0;
 
@@ -167,8 +156,6 @@ void ComputeProperties(const string &input_filename, const string &output_descri
   double E_max = 0.0;
   int x_orient = 0.0;
   int y_orient = 0.0;
-
-  ofstream output(output_descriptions_filename);
 
   for (int i = 0; i < input_rows; ++i) {
     for (int j = 0; j < input_cols; ++j) {
@@ -208,7 +195,6 @@ void ComputeProperties(const string &input_filename, const string &output_descri
     // calculate orientation
     Objects[i].orientation = 180.0 * (theta / M_PI);
   }
-  
 }
 
 // @brief Compute object properties
@@ -221,8 +207,11 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
   cout << "input descriptions filename: " << input_descriptions_filename << endl;
   cout << "Output image filename: " << output_filename << endl;
   
+  Image input;
+  ReadImage(input_filename, &input);
+
   std::vector<ObjectDesc> DatabaseObjects;
-  std::vector<ObjectDesc> Inputbjects;
+  std::vector<ObjectDesc> InputObjects;
   
   string object_label_str = "";
   string row_centr_str = "";
@@ -239,6 +228,13 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
   int area = 0;
   double roundedness = 0;
   double orientation = 0;
+
+  double theta = 0.0;
+  double theta2 = 0.0;
+  double E_min = 0.0;
+  double E_max = 0.0;
+  int x_orient = 0.0;
+  int y_orient = 0.0;
 
   int current_pixel;
   ifstream fin(input_descriptions_filename);
@@ -259,9 +255,69 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
     new_object.e_min = stod(e_min_str);
     new_object.area = stoi(area_str);
     new_object.roundedness = stod(roundedness_str); 
-    new_object.roundedness = stod(orientation_str); 
+    new_object.orientation = stod(orientation_str); 
+
+    DatabaseObjects.push_back(new_object);
   }
 
+  int db_length = DatabaseObjects.size();
+  // for(int i = 0; i < db_length; i++) {
+  //   cout << i << " ";
+  //   cout << DatabaseObjects[i].area << " ";
+  //   cout << DatabaseObjects[i].row_centr << " ";
+  //   cout << DatabaseObjects[i].col_centr << " ";
+
+  //   cout << "emin: " << DatabaseObjects[i].e_min << " ";
+  //   cout << "roundedness: " << DatabaseObjects[i].roundedness << " ";
+  //   cout << "orientation: " << DatabaseObjects[i].orientation << endl;
+  // }
+
+  ComputeProperties(input, InputObjects);
+
+  int input_length = InputObjects.size();
+  for(int i = 0; i < db_length; i++) {
+    for(int j = 0; j < input_length; j++) {
+      double perc_diff = abs((double)(InputObjects[j].area - (double)DatabaseObjects[i].area)/ (double)DatabaseObjects[i].area);
+      
+      if(perc_diff <= .15) {
+        // cout << "area: " << perc_diff << " ";
+        perc_diff = abs((InputObjects[j].roundedness - DatabaseObjects[i].roundedness)/ DatabaseObjects[i].roundedness);
+        // cout << "round: " << perc_diff << endl;
+        if(perc_diff <= .15) {
+          InputObjects[j].detected = true;
+        }
+      }
+    }
+  }
+
+  for(int i = 0; i < input_length; i++) {
+    if(InputObjects[i].detected == true) {
+      InputObjects[i].theta = atan2(InputObjects[i].b, (InputObjects[i].a-InputObjects[i].c)) / 2.0;
+      InputObjects[i].theta2 = InputObjects[i].theta + M_PI / 2.0;
+      theta = InputObjects[i].theta;
+      theta2 = InputObjects[i].theta2;
+
+      // calculate E_min and E_max
+      InputObjects[i].e_min = (InputObjects[i].a*pow(sin(theta), 2)) - (InputObjects[i].b*sin(theta)*cos(theta)) + (InputObjects[i].c*pow(cos(theta), 2));
+      InputObjects[i].e_max = (InputObjects[i].a*pow(sin(theta2), 2)) - (InputObjects[i].b*sin(theta2)*cos(theta2)) + (InputObjects[i].c*pow(cos(theta2), 2));
+
+      // calculate roundedness
+      E_min = InputObjects[i].e_min;
+      E_max = InputObjects[i].e_max;
+
+      InputObjects[i].roundedness = E_min / E_max;
+
+      // calculate orientation
+      InputObjects[i].orientation = 180.0 * (theta / M_PI);
+
+      // draw lines
+      x_orient = InputObjects[i].row_centr + 30 * cos(theta); // x value of point on orientation line
+      y_orient = InputObjects[i].col_centr + 30 * sin(theta); // x value of point on orientation line
+
+      DrawLine(InputObjects[i].row_centr, InputObjects[i].col_centr, x_orient, y_orient, 150, &input);
+    }
+  }
+  WriteImage(output_filename, input);
 }
 
 int main(int argc, char **argv){
