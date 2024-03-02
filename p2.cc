@@ -43,7 +43,6 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
   int min_pixel = 0;
   int left_root = 0;
   int top_root = 0;
-  // cout << "Current Label: " << current_label << "\n";
 
   // First Pass - Assigning Labels
   for (int i = 0; i < input_rows; ++i) {
@@ -74,28 +73,24 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
         if((diagonal_pixel == 0) && (left_pixel == 0) && (top_pixel == 0)) {
           input.SetPixel(i, j, current_label);
           current_label++;
-          // cout << current_label << "\n";
         } else if(diagonal_pixel > 0) {
           //left diagonal isn't background
           input.SetPixel(i, j, diagonal_pixel);
-          // cout << "diag\n";
         } else if(diagonal_pixel == 0) {
           if((left_pixel > 0) && (top_pixel == 0)) {
             //left isn't background
-            // cout << "left\n";
             input.SetPixel(i, j, left_pixel);
           } else if(((left_pixel == 0) && (top_pixel > 0))) {
             //top isn't background
-            // cout << "top\n";
             input.SetPixel(i, j, top_pixel);
           } else if((left_pixel > 0) && (top_pixel > 0)) {
             //top and left aren't background
-            // min_pixel = (top_pixel, left_pixel); // calc min gray level
             input.SetPixel(i, j, top_pixel);
             if(left_pixel != top_pixel) {
               left_root = EqClasses.find(left_pixel);
               top_root = EqClasses.find(top_pixel);
 
+              // union roots of pixels if they aren't in the same set
               if(top_root != left_root) {
                 EqClasses.unionSets(top_root, left_root);
               }
@@ -119,7 +114,6 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
       input.SetPixel(i,j, min_pixel);
 
       roots.insert(min_pixel);
-      // cout << "set to: " << min_pixel << "\n";
     }
   }
 
@@ -131,7 +125,6 @@ void PerformSequentialLabeling(const string &input_filename, const string &outpu
       current_pixel = input.GetPixel(i, j);
 
       colors.insert(current_pixel);
-      // cout << "set to: " << min_pixel << "\n";
     }
   }
 

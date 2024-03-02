@@ -19,6 +19,7 @@
 using namespace std;
 using namespace ComputerVisionProjects;
 
+// contains descriptions of a specific object
 struct ObjectDesc {
   int object_label = 0;
   int area = 0;
@@ -38,10 +39,9 @@ struct ObjectDesc {
   bool detected = false;
 };
 
-//returns index of object with current_pixel's label from the objects vector
-// @brief 
-// @param 
-// @param
+// @brief returns index of object with current_pixel's label from the objects vector
+// @param objects vector of structs containing each objects descriptions from an input image
+// @param current_pixel gray level value of the specified pixel at (row, column)
 int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
   int length = objects.size();
   int index = -1;
@@ -54,13 +54,12 @@ int FindObject(std::vector<ObjectDesc>& objects, int current_pixel) {
   return index;
 }
 
-// increases num of rows and cols in an object
-// @brief 
-// @param 
-// @param 
-// @param 
-// @param 
-// @param 
+// @brief increases num of rows and cols in an object
+// @param objects vector of structs containing each objects descriptions from an input image
+// @param labels set containing gray levels already seen in the image
+// @param current_pixel gray level value of the specified pixel at (row, column)
+// @param row_coord the x-coordinate of the current specified pixel
+// @param col_coord the y-coordinate of the current specified pixel
 void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel, int row_coord, int col_coord) {
   int obj_index;
   
@@ -77,11 +76,11 @@ void incrementObjVals(std::vector<ObjectDesc>& objects, std::set<int>& labels, i
   }
 } 
 
-w
+
 // @brief increases area of each object with label current_pixel and creates new objects as necessary
-// @param 
-// @param 
-// @param 
+// @param objects vector of structs containing each objects descriptions from an input image
+// @param labels set containing gray levels already seen in the image
+// @param current_pixel gray level value of the specified pixel at (row, column)
 void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int current_pixel) {
   int obj_index;
 
@@ -108,10 +107,9 @@ void CalculateArea(std::vector<ObjectDesc>& objects, std::set<int>& labels, int 
   }
 }
 
-// @brief 
-// @param 
-// @param 
-// @param 
+// @brief calculates the second moments of each object
+// @param objects vector of structs containing each objects descriptions from an input image
+// @param labels set containing gray levels already seen in the image
 void CalculateMoments(Image input, std::vector<ObjectDesc>& objects, std::set<int>& labels) {
   size_t input_rows = input.num_rows();
   size_t input_cols = input.num_columns();
@@ -267,9 +265,7 @@ void FindLabeledObject(const string &input_filename, const string &input_descrip
       double perc_diff = abs((double)(InputObjects[j].area - (double)DatabaseObjects[i].area)/ (double)DatabaseObjects[i].area);
       
       if(perc_diff <= .15) {
-        // cout << "area: " << perc_diff << " ";
         perc_diff = abs((InputObjects[j].roundedness - DatabaseObjects[i].roundedness)/ DatabaseObjects[i].roundedness);
-        // cout << "round: " << perc_diff << endl;
         if(perc_diff <= .15) {
           InputObjects[j].detected = true;
         }
